@@ -30,7 +30,6 @@ namespace Bangazon.Models
 
         [Required]
         public int Quantity { get; set; }
-
         [Required]
         public string UserId {get; set;}
 
@@ -40,7 +39,6 @@ namespace Bangazon.Models
 
         public bool Active { get; set; }
 
-        
         public ApplicationUser User { get; set; }
 
         [Required]
