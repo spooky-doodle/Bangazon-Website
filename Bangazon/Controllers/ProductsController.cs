@@ -15,9 +15,10 @@ namespace Bangazon.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         private readonly UserManager<ApplicationUser> _userManager;
