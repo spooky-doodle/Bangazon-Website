@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
 using Bangazon.Models.ProductViewModels;
+using Bangazon.Models.ProductTypeViewModel;
 
 namespace Bangazon.Controllers
 {
@@ -66,6 +67,15 @@ namespace Bangazon.Controllers
                 }).ToListAsync();
 
             return View(prods.AsEnumerable());
+        }
+
+        public async Task<IActionResult> ProductTypeList(int productTypeId)
+        {
+
+            var products = await _context.Product
+                .Where(p => p.ProductTypeId == productTypeId).ToListAsync();
+
+            return View();
         }
 
 
