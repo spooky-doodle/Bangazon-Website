@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bangazon.Controllers
 {
@@ -18,6 +19,8 @@ namespace Bangazon.Controllers
         {
             _context = context;
         }
+
+        private readonly UserManager<ApplicationUser> _userManager;
 
         // GET: Products
         public async Task<IActionResult> Index()
@@ -63,6 +66,8 @@ namespace Bangazon.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = await GetUserAsync();
+                product.UserId = user.Id;
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -161,6 +166,10 @@ namespace Bangazon.Controllers
         private bool ProductExists(int id)
         {
             return _context.Product.Any(e => e.ProductId == id);
+        }
+        private Task<ApplicationUser> GetUserAsync()
+        {
+            return _userManager.GetUserAsync(HttpContext.User);
         }
     }
 }
