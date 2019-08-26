@@ -15,6 +15,7 @@ It shows how to remove a model's property from the automatic model binding in a 
 1. Add all new group members to your slack channel and your Github organization.
 1. The chosen person will clone the team's repository to their machine. **No one else should**.
 1. Create a branch named `initial-setup`.
+1. Create a pull request template and add it your repo.
 1. Open Visual Studio and load the solution file.
 1. Create a copy of `appsettings.json.example` and name the file `appsettings.json` Make sure the connection string is correct.
 1. Move on to the **Seeding the Database** section.
