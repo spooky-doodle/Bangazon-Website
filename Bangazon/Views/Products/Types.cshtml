@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Bangazon.Models.ProductViewModels.GroupedProducts>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Products</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Products)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TypeName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductCount)
+            </td>
+            <td>
+                    @foreach (var prod in item.Products)
+                    {
+                        <p style="margin: 0;">@Html.DisplayFor(modelItem => prod.Title)</p>
+                    }
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.TypeId">Details</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
