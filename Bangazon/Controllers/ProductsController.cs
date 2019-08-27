@@ -44,7 +44,7 @@ namespace Bangazon.Controllers
             }
             else
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated); ;
                 return View(await applicationDbContext.ToListAsync());
             }
 
