@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Bangazon.Models.ProductViewModels;
 using System.IO;
 using Grpc.Core;
@@ -20,10 +22,13 @@ namespace Bangazon.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
+        private readonly UserManager<ApplicationUser> _userManager;
 
         // GET: Products
         public async Task<IActionResult> Index(string userInput)
@@ -108,6 +113,7 @@ namespace Bangazon.Controllers
 
 
         // GET: Products/Create
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label");
@@ -116,15 +122,20 @@ namespace Bangazon.Controllers
         }
 
         // POST: Products/Create
-
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("ProductId,Description,Title,Price,Quantity,City,Active,ProductTypeId")] Product product,
             IFormFile file)
         {
+            ModelState.Remove("UserId");
             if (ModelState.IsValid)
             {
+                var user = await GetUserAsync();
+                product.UserId = user.Id;
 
                 //string path = Path.Combine(Server.MapPath("~/images"), Path.GetFileName(file.FileName));
                 //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
@@ -227,6 +238,9 @@ namespace Bangazon.Controllers
         {
             return _context.Product.Any(e => e.ProductId == id);
         }
-
+        private Task<ApplicationUser> GetUserAsync()
+        {
+            return _userManager.GetUserAsync(HttpContext.User);
+        }
     }
 }
