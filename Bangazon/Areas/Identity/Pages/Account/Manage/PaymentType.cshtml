@@ -28,6 +28,19 @@
             </div>
         </form>
     </div>
+    <div>
+       @if (Model.PaymentTypeCount > 0)
+       {
+           <div>Current Payment Types</div>
+           <ul>
+               @foreach (var item in Model.PaymentTypes)
+               {
+                   <li>@item.Description</li>
+               }
+           </ul>
+       }
+
+    </div>
 </div>
 
 @section Scripts {

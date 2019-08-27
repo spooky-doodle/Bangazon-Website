@@ -4,10 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Bangazon.Data;
 using Bangazon.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bangazon.Areas.Identity.Pages.Account.Manage
 {
@@ -15,14 +17,21 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ApplicationDbContext _context;
+
 
         public PaymentTypeModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
         }
+
+        public ICollection<PaymentType> PaymentTypes { get; set; }
+        public int PaymentTypeCount { get { return PaymentTypes.Count(); } }
 
         [BindProperty]
         public InputModel Input { get; set; }
@@ -45,7 +54,10 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGet()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            PaymentTypes = await _context.PaymentType
+                .Where(pt => pt.UserId == user.Id).ToListAsync();
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -67,8 +79,17 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            var paymentType = new PaymentType()
+            {
+                UserId = user.Id,
+                Description = Input.Description,
+                AccountNumber = Input.AccountNumber,
+                User = user
+            };
+
+            _context.Add(paymentType);
+            await _context.SaveChangesAsync();
+
             return RedirectToPage();
         }
     }
