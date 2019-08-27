@@ -51,6 +51,30 @@ namespace Bangazon.Controllers
 
         }
 
+        // GET: Products/MyProducts
+        public async Task<IActionResult> MyProducts(string userInput)
+        {
+            var userInputNotEmpty = !String.IsNullOrEmpty(userInput);
+            var user = await GetUserAsync();
+            if (userInputNotEmpty)
+            {
+                var applicationDbContext = _context.Product
+                                            .Include(p => p.ProductType)
+                                            .Include(p => p.User)
+                                            .Where(p => p.Title.Contains(userInput) && p.UserId == user.Id);
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else
+            {
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated).Where(p => p.UserId == user.Id); ;
+                return View(await applicationDbContext.ToListAsync());
+            }
+
+
+        }
+
+
+
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
