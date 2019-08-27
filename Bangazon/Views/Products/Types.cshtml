@@ -4,11 +4,8 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Products</h1>
+<h1>Product Types</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -40,7 +37,8 @@
                     }
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.TypeId">Details</a>
+                <a asp-controller="Products" asp-action="ProductTypeList" asp-route-id="@item.TypeId">View All Products in @item.TypeName</a>
+                
             </td>
         </tr>
 }
