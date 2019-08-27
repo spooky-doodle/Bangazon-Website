@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bangazon", "Bangazon\Bangazon.csproj", "{EAC38DD1-AAE9-404E-8920-202D178BFE24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bangazon", "Bangazon\Bangazon.csproj", "{EAC38DD1-AAE9-404E-8920-202D178BFE24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
