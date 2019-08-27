@@ -8,6 +8,7 @@ namespace Bangazon
 {
     public class PaginatedList<T> : List<T>
     {
+        //Page Index
         public int PageIndex { get; private set; }
         public int TotalPages { get; private set; }
 
