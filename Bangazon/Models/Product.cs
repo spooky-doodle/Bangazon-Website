@@ -35,6 +35,7 @@ namespace Bangazon.Models
         public int Quantity { get; set; }
         [Required]
         public string UserId {get; set;}
+        [Display(Name = "Local Delivery")]
         [RegularExpression(@"^[0-9a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Special characters are not allowed")]
         public string City {get; set;}
 

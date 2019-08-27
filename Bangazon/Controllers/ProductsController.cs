@@ -40,7 +40,7 @@ namespace Bangazon.Controllers
                 var applicationDbContext = _context.Product
                                             .Include(p => p.ProductType)
                                             .Include(p => p.User)
-                                            .Where(p => p.Title.Contains(userInput))
+                                            .Where(p => p.Title.Contains(userInput) || p.Description.Contains(userInput) || p.City.Contains(userInput))
                                             .OrderByDescending(p => p.DateCreated);
                 int pageSize = 20;
                 return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
@@ -49,7 +49,10 @@ namespace Bangazon.Controllers
             else
             {
                 
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated);
+                var applicationDbContext = _context.Product
+                                            .Include(p => p.ProductType)
+                                            .Include(p => p.User)
+                                            .OrderByDescending(p => p.DateCreated);
                 int pageSize = 20;
                 return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
             }
