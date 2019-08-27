@@ -1,0 +1,57 @@
+﻿@model Bangazon.Models.OrderViewModels.OrderDetailViewModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<h1>Cart</h1>
+
+<div>
+    <hr />
+    @{ if (Model == null)
+        {
+            <div class="col-sm-2">
+                <p>Your cart is empty.</p>
+            </div>
+        }
+
+        if (Model != null)
+        {
+            
+            <table class="table table-light">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.LineItems)
+                    {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Product.Title)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Units)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Product.Price)</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <hr />
+            <tbody>
+                
+                    <tr>
+                        <td>Total:</td>
+                        <td>@(Model.Total)</td>
+
+                    </tr>
+                
+            </tbody>
+            <div>
+                <a asp-action="Edit" asp-route-id="@Model.Order.OrderId">Edit</a> |
+                <a asp-action="Index">Back to List</a>
+            </div>
+        }
+    }
+</div>
