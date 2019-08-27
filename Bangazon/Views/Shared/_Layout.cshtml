@@ -47,6 +47,14 @@
                             if (User.Identity.IsAuthenticated)
                             {
                                 <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="MyProducts">MyProducts</a>
+                                </li>
+                            }
+                        }
+                        @{
+                            if (User.Identity.IsAuthenticated)
+                            {
+                                <li class="nav-item">
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Orders" asp-action="Cart">View Cart</a>
                                 </li>
                             }
@@ -54,12 +62,12 @@
 
                        
                         @*@using (Html.BeginForm())
-                        {
-                            <p>
-                                Find Products: @Html.TextBox("userInput")
-                                <input type="submit" value="Search" onclick="window.location='@Url.Action("Index", "Products")'"/>
-                            </p>
-                        }*@
+        {
+            <p>
+                Find Products: @Html.TextBox("userInput")
+                <input type="submit" value="Search" onclick="window.location='@Url.Action("Index", "Products")'"/>
+            </p>
+        }*@
                     </ul>
                 </div>
             </div>

@@ -31,25 +31,57 @@ namespace Bangazon.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         // GET: Products
-        public async Task<IActionResult> Index(string userInput)
+        public async Task<IActionResult> Index(string userInput, int? pageNumber)
         {
             var userInputNotEmpty = !String.IsNullOrEmpty(userInput);
+            if (userInputNotEmpty)
+            {
+                pageNumber = 1;
+                var applicationDbContext = _context.Product
+                                            .Include(p => p.ProductType)
+                                            .Include(p => p.User)
+                                            .Where(p => p.Title.Contains(userInput))
+                                            .OrderByDescending(p => p.DateCreated);
+                //return View(await applicationDbContext.ToListAsync());
+                int pageSize = 20;
+                return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
+
+            }
+            else
+            {
+                
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated);
+                int pageSize = 20;
+                return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
+                //return View(await applicationDbContext.ToListAsync());
+            }
+
+
+        }
+
+        // GET: Products/MyProducts
+        public async Task<IActionResult> MyProducts(string userInput)
+        {
+            var userInputNotEmpty = !String.IsNullOrEmpty(userInput);
+            var user = await GetUserAsync();
             if (userInputNotEmpty)
             {
                 var applicationDbContext = _context.Product
                                             .Include(p => p.ProductType)
                                             .Include(p => p.User)
-                                            .Where(p => p.Title.Contains(userInput));
+                                            .Where(p => p.Title.Contains(userInput) && p.UserId == user.Id);
                 return View(await applicationDbContext.ToListAsync());
             }
             else
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated); ;
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated).Where(p => p.UserId == user.Id); ;
                 return View(await applicationDbContext.ToListAsync());
             }
 
 
         }
+
+
 
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
