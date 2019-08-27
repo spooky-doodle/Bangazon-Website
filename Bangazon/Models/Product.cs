@@ -17,10 +17,12 @@ namespace Bangazon.Models
         public DateTime DateCreated {get;set;}
 
         [Required]
+        [RegularExpression(@"^[0-9a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Special characters are not allowed")]
         [StringLength(255)]
         public string Description { get; set; }
 
         [Required]
+        [RegularExpression(@"^[0-9a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Special characters are not allowed")]
         [StringLength(55, ErrorMessage="Please shorten the product title to 55 characters")]
         public string Title { get; set; }
 
@@ -33,7 +35,8 @@ namespace Bangazon.Models
         public int Quantity { get; set; }
         [Required]
         public string UserId {get; set;}
-
+        [Display(Name = "Local Delivery")]
+        [RegularExpression(@"^[0-9a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Special characters are not allowed")]
         public string City {get; set;}
 
         public string ImagePath {get; set;}
