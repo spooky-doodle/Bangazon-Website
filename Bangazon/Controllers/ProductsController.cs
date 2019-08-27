@@ -25,10 +25,24 @@ namespace Bangazon.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string userInput)
         {
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
-            return View(await applicationDbContext.ToListAsync());
+            var userInputNotEmpty = !String.IsNullOrEmpty(userInput);
+            if (userInputNotEmpty)
+            {
+                var applicationDbContext = _context.Product
+                                            .Include(p => p.ProductType)
+                                            .Include(p => p.User)
+                                            .Where(p => p.Title.Contains(userInput));
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else
+            {
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
+                return View(await applicationDbContext.ToListAsync());
+            }
+
+
         }
 
         // GET: Products/Details/5
@@ -82,15 +96,16 @@ namespace Bangazon.Controllers
         }
 
         // POST: Products/Create
-   
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("ProductId,Description,Title,Price,Quantity,City,Active,ProductTypeId")] Product product,
-            IFormFile file )
+            IFormFile file)
         {
             if (ModelState.IsValid)
             {
+
                 //string path = Path.Combine(Server.MapPath("~/images"), Path.GetFileName(file.FileName));
                 //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
                 _context.Add(product);
