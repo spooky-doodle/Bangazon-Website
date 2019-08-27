@@ -75,14 +75,13 @@ namespace Bangazon.Controllers
 
             viewModel.ProductTypeId = id;
 
-            var productType = _context.ProductType
-                .Where(pt => pt.ProductTypeId == id).Single();
-
-            viewModel.Label = productType.Label;
+            var productType = await _context.ProductType
+                .Include(pt => pt.Products)
+                .Where(pt => pt.ProductTypeId == id).SingleAsync();
+                
             viewModel.ProductType = productType;
-
-            viewModel.Products = await _context.Product
-                .Where(p => p.ProductTypeId == id).ToListAsync();
+            viewModel.Label = productType.Label;
+            viewModel.Products = productType.Products;
 
             viewModel.ProductCount = viewModel.Products.Count();
 

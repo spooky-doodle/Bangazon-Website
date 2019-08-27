@@ -15,7 +15,7 @@ namespace Bangazon.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -83,7 +83,7 @@ namespace Bangazon.Migrations
                         {
                             Id = "00000000-ffff-ffff-ffff-ffffffffffff",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2f3727a0-9b77-4d90-ac88-3dd9458b312f",
+                            ConcurrencyStamp = "87e33c2f-5388-4574-9fc7-7def7502fe0b",
                             Email = "admin@admin.com",
                             EmailConfirmed = true,
                             FirstName = "Admina",
@@ -91,7 +91,7 @@ namespace Bangazon.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@ADMIN.COM",
                             NormalizedUserName = "ADMIN@ADMIN.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJA7SRlIgwOmETzefvXidDJV8vEEtc7a4M+6XhQfS4IbRuVE6/cR+lTtX0GxwXghXw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEAGCU0mg9yqG/0kn9Njhr6I6vTmKvSMV4XKHkFgTuCzKVkeXkDYbwq8V2KkFOt03BA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "7f434309-a4d9-48e9-9ebb-8803db794577",
                             StreetAddress = "123 Infinity Way",
