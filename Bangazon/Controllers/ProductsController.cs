@@ -42,7 +42,6 @@ namespace Bangazon.Controllers
                                             .Include(p => p.User)
                                             .Where(p => p.Title.Contains(userInput))
                                             .OrderByDescending(p => p.DateCreated);
-                //return View(await applicationDbContext.ToListAsync());
                 int pageSize = 20;
                 return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
 
@@ -53,7 +52,6 @@ namespace Bangazon.Controllers
                 var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated);
                 int pageSize = 20;
                 return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
-                //return View(await applicationDbContext.ToListAsync());
             }
 
 
