@@ -31,21 +31,29 @@ namespace Bangazon.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         // GET: Products
-        public async Task<IActionResult> Index(string userInput)
+        public async Task<IActionResult> Index(string userInput, int? pageNumber)
         {
             var userInputNotEmpty = !String.IsNullOrEmpty(userInput);
             if (userInputNotEmpty)
             {
+                pageNumber = 1;
                 var applicationDbContext = _context.Product
                                             .Include(p => p.ProductType)
                                             .Include(p => p.User)
-                                            .Where(p => p.Title.Contains(userInput));
-                return View(await applicationDbContext.ToListAsync());
+                                            .Where(p => p.Title.Contains(userInput))
+                                            .OrderByDescending(p => p.DateCreated);
+                //return View(await applicationDbContext.ToListAsync());
+                int pageSize = 20;
+                return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
+
             }
             else
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated); ;
-                return View(await applicationDbContext.ToListAsync());
+                
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).OrderByDescending(p => p.DateCreated);
+                int pageSize = 20;
+                return View(await PaginatedList<Product>.CreateAsync(applicationDbContext.AsNoTracking(), pageNumber ?? 1, pageSize));
+                //return View(await applicationDbContext.ToListAsync());
             }
 
 
