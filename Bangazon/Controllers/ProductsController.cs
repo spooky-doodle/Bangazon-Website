@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
 using Bangazon.Models.ProductViewModels;
+using Bangazon.Models.ProductTypeViewModel;
 
 namespace Bangazon.Controllers
 {
@@ -66,6 +67,25 @@ namespace Bangazon.Controllers
                 }).ToListAsync();
 
             return View(prods.AsEnumerable());
+        }
+
+        public async Task<IActionResult> ProductTypeList(int id)
+        {
+            var viewModel = new ProductTypeListViewModel();
+
+            viewModel.ProductTypeId = id;
+
+            var productType = await _context.ProductType
+                .Include(pt => pt.Products)
+                .Where(pt => pt.ProductTypeId == id).SingleAsync();
+                
+            viewModel.ProductType = productType;
+            viewModel.Label = productType.Label;
+            viewModel.Products = productType.Products;
+
+            viewModel.ProductCount = viewModel.Products.Count();
+
+            return View(viewModel);
         }
 
 
@@ -185,5 +205,6 @@ namespace Bangazon.Controllers
         {
             return _context.Product.Any(e => e.ProductId == id);
         }
+
     }
 }
