@@ -31,7 +31,7 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
         }
 
         public ICollection<PaymentType> PaymentTypes { get; set; }
-        public int PaymentTypeCount { get { return PaymentTypes.Count(); } }
+        public int? PaymentTypeCount { get { return PaymentTypes.Count(); } }
 
         [BindProperty]
         public InputModel Input { get; set; }
@@ -90,6 +90,16 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
             _context.Add(paymentType);
             await _context.SaveChangesAsync();
 
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostDelete(int id)
+        {
+            var paymentType = await _context.PaymentType
+                .Where(pt => pt.PaymentTypeId == id).SingleAsync();
+
+            _context.PaymentType.Remove(paymentType);
+            await _context.SaveChangesAsync();
             return RedirectToPage();
         }
     }
