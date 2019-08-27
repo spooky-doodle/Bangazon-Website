@@ -9,6 +9,8 @@ using Bangazon.Data;
 using Bangazon.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Bangazon.Models.ProductViewModels;
+using Bangazon.Models.ProductTypeViewModel;
 
 namespace Bangazon.Controllers
 {
@@ -50,6 +52,47 @@ namespace Bangazon.Controllers
 
             return View(product);
         }
+
+        public async Task<IActionResult> Types()
+        {
+
+            // Build list of Product instances for display in view
+            // LINQ is awesome
+            var prods = await (
+                from t in _context.ProductType
+                join p in _context.Product
+                on t.ProductTypeId equals p.ProductTypeId
+                group new { t, p } by new { t.ProductTypeId, t.Label } into grouped
+                select new GroupedProducts
+                {
+                    TypeId = grouped.Key.ProductTypeId,
+                    TypeName = grouped.Key.Label,
+                    ProductCount = grouped.Select(x => x.p.ProductId).Count(),
+                    Products = grouped.Select(x => x.p).Take(3)
+                }).ToListAsync();
+
+            return View(prods.AsEnumerable());
+        }
+
+        public async Task<IActionResult> ProductTypeList(int id)
+        {
+            var viewModel = new ProductTypeListViewModel();
+
+            viewModel.ProductTypeId = id;
+
+            var productType = await _context.ProductType
+                .Include(pt => pt.Products)
+                .Where(pt => pt.ProductTypeId == id).SingleAsync();
+                
+            viewModel.ProductType = productType;
+            viewModel.Label = productType.Label;
+            viewModel.Products = productType.Products;
+
+            viewModel.ProductCount = viewModel.Products.Count();
+
+            return View(viewModel);
+        }
+
 
         // GET: Products/Create
         [Authorize]
