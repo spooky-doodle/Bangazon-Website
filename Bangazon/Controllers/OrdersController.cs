@@ -36,8 +36,13 @@ namespace Bangazon.Controllers
                                             //.ThenInclude(Op => Op.Product)
                                             .Where(o => user.Id == o.UserId && o.DateCompleted == null)
                                             .FirstOrDefaultAsync();
-                viewModel.LineItems = await GetLineItems(viewModel.Order.OrderProducts);
-                return View(viewModel);
+                if (viewModel.Order == null) { viewModel = null; }
+                else
+                {
+                    viewModel.LineItems = await GetLineItems(viewModel.Order.OrderProducts);
+                }
+                    return View(viewModel);
+
             }
             else
             {
