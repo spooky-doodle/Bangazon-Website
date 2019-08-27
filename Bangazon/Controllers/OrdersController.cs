@@ -7,23 +7,59 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bangazon.Controllers
 {
     public class OrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public OrdersController(ApplicationDbContext context)
+        public OrdersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
+
+        // Cart
+        public async Task<IActionResult> Cart()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user != null)
+            {
+                
+                var applicationDbContext = _context.Order
+                                            .Include(o => o.User)
+                                            .Include(o => o.OrderProducts)
+                                            .ThenInclude(Op => Op.Product)
+                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null);
+                return View(await applicationDbContext.FirstOrDefaultAsync());
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
 
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Order.Include(o => o.PaymentType).Include(o => o.User);
-            return View(await applicationDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user != null)
+            {
+                var applicationDbContext = _context.Order
+                                            .Include(o => o.PaymentType)
+                                            .Include(o => o.User)
+                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null);
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         // GET: Orders/Details/5
