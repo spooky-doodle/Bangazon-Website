@@ -40,7 +40,8 @@
                     }
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.TypeId">View All Products</a>
+                <a asp-controller="Products" asp-action="ProductTypeList" asp-route-id="@item.TypeId">View All Products In @item.TypeName</a>
+                
             </td>
         </tr>
 }

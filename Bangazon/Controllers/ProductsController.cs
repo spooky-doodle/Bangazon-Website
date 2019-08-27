@@ -69,13 +69,24 @@ namespace Bangazon.Controllers
             return View(prods.AsEnumerable());
         }
 
-        public async Task<IActionResult> ProductTypeList(int productTypeId)
+        public async Task<IActionResult> ProductTypeList(int id)
         {
+            var viewModel = new ProductTypeListViewModel();
 
-            var products = await _context.Product
-                .Where(p => p.ProductTypeId == productTypeId).ToListAsync();
+            viewModel.ProductTypeId = id;
 
-            return View();
+            var productType = _context.ProductType
+                .Where(pt => pt.ProductTypeId == id).Single();
+
+            viewModel.Label = productType.Label;
+            viewModel.ProductType = productType;
+
+            viewModel.Products = await _context.Product
+                .Where(p => p.ProductTypeId == id).ToListAsync();
+
+            viewModel.ProductCount = viewModel.Products.Count();
+
+            return View(viewModel);
         }
 
 
@@ -195,5 +206,6 @@ namespace Bangazon.Controllers
         {
             return _context.Product.Any(e => e.ProductId == id);
         }
+
     }
 }
