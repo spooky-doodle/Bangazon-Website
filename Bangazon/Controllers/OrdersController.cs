@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
 using Microsoft.AspNetCore.Identity;
+using Bangazon.Models.OrderViewModels;
 
 namespace Bangazon.Controllers
 {
@@ -28,13 +29,15 @@ namespace Bangazon.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user != null)
             {
-                
-                var applicationDbContext = _context.Order
+                var viewModel = new OrderDetailViewModel();
+                viewModel.Order = await _context.Order
                                             .Include(o => o.User)
                                             .Include(o => o.OrderProducts)
-                                            .ThenInclude(Op => Op.Product)
-                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null);
-                return View(await applicationDbContext.FirstOrDefaultAsync());
+                                            //.ThenInclude(Op => Op.Product)
+                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null)
+                                            .FirstOrDefaultAsync();
+                viewModel.LineItems = await GetLineItems(viewModel.Order.OrderProducts);
+                return View(viewModel);
             }
             else
             {
@@ -42,7 +45,21 @@ namespace Bangazon.Controllers
             }
         }
 
-
+        // get products from list of OProducts.
+        private async Task<ICollection<OrderLineItem>> GetLineItems(ICollection<OrderProduct> orderProducts)
+        {
+            var items = new List<OrderLineItem>();
+            var tasks = orderProducts.Select(async prod =>
+            {
+                items.Add(new OrderLineItem()
+                {
+                    Product = await _context.Product.Where(p => p.ProductId == prod.ProductId).FirstOrDefaultAsync(),
+                    Units = await _context.Product.Where(p => p.ProductId == prod.ProductId).CountAsync()
+                });
+            });
+            await Task.WhenAll(tasks);
+            return items;
+        }
 
         // GET: Orders
         public async Task<IActionResult> Index()

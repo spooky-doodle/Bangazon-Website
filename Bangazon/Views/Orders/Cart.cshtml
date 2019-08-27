@@ -17,20 +17,37 @@
 
         if (Model != null)
         {
-            <div>
-                <dl class="row">
-                    <dt class="col-sm-2">
-                        @Html.DisplayNameFor(model => model.Order.DateCreated)
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Order.DateCreated)
-                    </dd>
-                </dl>
-            </div>
-            @foreach (var item in Model.LineItems)
-            {
+            
+            <table class="table table-light">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.LineItems)
+                    {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.Product.Title)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Units)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Product.Price)</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <hr />
+            <tbody>
                 
-            }
+                    <tr>
+                        <td>Total:</td>
+                        <td>@(Model.Total)</td>
+
+                    </tr>
+                
+            </tbody>
             <div>
                 <a asp-action="Edit" asp-route-id="@Model.Order.OrderId">Edit</a> |
                 <a asp-action="Index">Back to List</a>
