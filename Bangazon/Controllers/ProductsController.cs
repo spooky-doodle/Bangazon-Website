@@ -91,7 +91,8 @@ namespace Bangazon.Controllers
             {
                 return NotFound();
             }
-
+            var user = await GetUserAsync();
+            
             var product = await _context.Product
                 .Include(p => p.ProductType)
                 .Include(p => p.User)

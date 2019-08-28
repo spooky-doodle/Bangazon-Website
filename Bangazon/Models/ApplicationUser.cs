@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace Bangazon.Models
@@ -25,10 +26,15 @@ namespace Bangazon.Models
 
         public string FullName => $"{FirstName} {LastName}";
 
+        [NotMapped]
         public virtual ICollection<Product> Products { get; set; }
-
+        [NotMapped]
         public virtual ICollection<Order> Orders { get; set; }
-
+        [NotMapped]
         public virtual ICollection<PaymentType> PaymentTypes { get; set; }
+        [NotMapped]
+        public virtual ICollection<UserProductOpinion> ProductsOpinion { get; set; }
+
+
     }
 }
