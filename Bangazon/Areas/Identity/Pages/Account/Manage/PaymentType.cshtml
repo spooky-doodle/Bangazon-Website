@@ -29,16 +29,19 @@
         </form>
     </div>
     <div>
-       @if (Model.PaymentTypeCount > 0)
-       {
-           <div>Current Payment Types</div>
-           <ul>
-               @foreach (var item in Model.PaymentTypes)
-               {
-                   <li>@item.Description</li>
-               }
-           </ul>
-       }
+        @if (Model.PaymentTypeCount > 0 && Model.PaymentTypeCount != null)
+        {
+
+            <h4>Current Payment Types</h4>
+
+            @foreach (var item in Model.PaymentTypes)
+            {
+                <form asp-page-handler="delete" asp-route-id="@item.PaymentTypeId" method="post">
+                    <label style="margin-right: 2rem">@item.Description</label>
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            }
+        }
 
     </div>
 </div>
