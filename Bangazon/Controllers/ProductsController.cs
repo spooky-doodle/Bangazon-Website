@@ -11,10 +11,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Bangazon.Models.ProductViewModels;
 using System.IO;
-using Grpc.Core;
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using Bangazon.Models.ProductTypeViewModel;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Bangazon.Controllers
 {
@@ -22,8 +23,15 @@ namespace Bangazon.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IHostingEnvironment _env;
+
+        public ProductsController(
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            IHostingEnvironment env
+            )
         {
+            _env = env;
             _context = context;
             _userManager = userManager;
         }
@@ -48,7 +56,7 @@ namespace Bangazon.Controllers
             }
             else
             {
-                
+
                 var applicationDbContext = _context.Product
                                             .Include(p => p.ProductType)
                                             .Include(p => p.User)
@@ -134,7 +142,7 @@ namespace Bangazon.Controllers
             var productType = await _context.ProductType
                 .Include(pt => pt.Products)
                 .Where(pt => pt.ProductTypeId == id).SingleAsync();
-                
+
             viewModel.ProductType = productType;
             viewModel.Label = productType.Label;
             viewModel.Products = productType.Products;
@@ -169,6 +177,25 @@ namespace Bangazon.Controllers
             {
                 var user = await GetUserAsync();
                 product.UserId = user.Id;
+                var webRoot = _env.WebRootPath;
+                var filePath = Path.Combine(
+                webRoot,
+                "images",
+                file.FileName);
+
+                var ext = GetMimeType(file.FileName);
+                try
+                {
+                    if (file.Length > 0)
+                    {
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                            product.ImagePath = $"~/images/{DateTime.Now}-{product.Title}.";
+                        };
+                    }
+
+                }catch (Exception ex) { }
 
                 //string path = Path.Combine(Server.MapPath("~/images"), Path.GetFileName(file.FileName));
                 //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
@@ -274,6 +301,17 @@ namespace Bangazon.Controllers
         private Task<ApplicationUser> GetUserAsync()
         {
             return _userManager.GetUserAsync(HttpContext.User);
+        }
+
+
+        private string GetMimeType(string fileName)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+            provider.TryGetContentType(fileName, out contentType);
+
+
+            return contentType;
         }
     }
 }
