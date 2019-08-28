@@ -56,11 +56,14 @@ namespace Bangazon.Controllers
             var items = new List<OrderLineItem>();
             var tasks = orderProducts.Select(async prod =>
             {
-                items.Add(new OrderLineItem()
+                if(!items.Any(i => i.Product.ProductId == prod.ProductId))
                 {
-                    Product = await _context.Product.Where(p => p.ProductId == prod.ProductId).FirstOrDefaultAsync(),
-                    Units = await _context.Product.Where(p => p.ProductId == prod.ProductId).CountAsync()
-                });
+                    items.Add(new OrderLineItem()
+                    {
+                        Product = await _context.Product.Where(p => p.ProductId == prod.ProductId).FirstOrDefaultAsync(),
+                        Units = await _context.OrderProduct.Where(p => p.ProductId == prod.ProductId).CountAsync()
+                    });
+                }
             });
             await Task.WhenAll(tasks);
             return items;

@@ -267,6 +267,69 @@ namespace Bangazon.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // POST: Add Product to Order
+        [Authorize]
+        [HttpPost, ActionName("ProductToCart")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProductToCart(int id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var product = await _context.Product.FirstOrDefaultAsync(p => p.ProductId == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            if (user != null)
+            {
+                var order = await GetOrCreateOrder(user);
+                
+                //if(_context.OrderProduct.Any(op => op.ProductId == id))
+                //{
+                //    var foundOrder = _context.Order
+                //        .Include(o => o.OrderProducts)
+                //        .Where(o => o.UserId == user.Id);
+
+                //    var foundLineItem = GetLineItems(foundOrder);
+                    
+                    
+                //}
+                _context.OrderProduct.Add(new OrderProduct()
+                {
+                    OrderId = order.OrderId,
+                    ProductId = product.ProductId
+                });
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Cart", "Orders");
+            }
+            return RedirectToAction("LogIn", "Account", new { area = "" });
+        }
+
+        private object GetLineItems(OrderProduct foundOrderProduct)
+        {
+            throw new NotImplementedException();
+        }
+
+        // helper method to get or create order for user
+        public async Task<Order> GetOrCreateOrder(ApplicationUser user)
+        {
+            var foundOrder = await _context.Order
+                                .Where(o => o.DateCompleted == null)
+                                .FirstOrDefaultAsync(o => o.UserId == user.Id);
+
+            if(foundOrder == null)
+            {
+                foundOrder = new Order()
+                {
+                    UserId = user.Id
+                };
+                _context.Order.Add(foundOrder);
+                await _context.SaveChangesAsync();
+            }
+
+            return foundOrder;
+        }
+
         private bool ProductExists(int id)
         {
             return _context.Product.Any(e => e.ProductId == id);
