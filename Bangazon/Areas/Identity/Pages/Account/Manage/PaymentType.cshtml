@@ -37,8 +37,8 @@
             @foreach (var item in Model.PaymentTypes)
             {
                 <form asp-page-handler="delete" asp-route-id="@item.PaymentTypeId" method="post">
-                    <label>@item.Description</label>
-                    <button class="btn btn-default">Delete</button>
+                    <label style="margin-right: 2rem">@item.Description</label>
+                    <button class="btn btn-sm btn-danger">Delete</button>
                 </form>
             }
         }
