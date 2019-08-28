@@ -30,5 +30,7 @@ namespace Bangazon.Models
         public virtual ICollection<Order> Orders { get; set; }
 
         public virtual ICollection<PaymentType> PaymentTypes { get; set; }
+
+        public virtual ICollection<ApplicationUser> UserFavoriteSellers { get; set; }
     }
 }
