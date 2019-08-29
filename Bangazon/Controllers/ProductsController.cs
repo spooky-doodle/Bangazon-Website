@@ -190,7 +190,7 @@ namespace Bangazon.Controllers
                 //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
                 _context.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = product.ProductId});
             }
             ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
@@ -294,7 +294,7 @@ namespace Bangazon.Controllers
 
         private async Task<string> SaveFile(IFormFile file, string userId)
         {
-            if (file.Length < 5242880) throw new Exception("File too large!");
+            if (file.Length > 5242880) throw new Exception("File too large!");
             var ext = GetMimeType(file.FileName);
             if (ext == null) throw new Exception("Invalid file type");
 
