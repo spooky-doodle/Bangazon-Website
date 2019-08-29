@@ -177,8 +177,14 @@ namespace Bangazon.Controllers
             {
                 var user = await GetUserAsync();
                 product.UserId = user.Id;
-                product.ImagePath = await SaveFile(file, user.Id);
-                
+                try
+                {
+                    product.ImagePath = await SaveFile(file, user.Id);
+                } catch (Exception ex)
+                {
+                    return NotFound();
+                }
+
 
                 //string path = Path.Combine(Server.MapPath("~/images"), Path.GetFileName(file.FileName));
                 //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
@@ -289,6 +295,7 @@ namespace Bangazon.Controllers
         private async Task<string> SaveFile(IFormFile file, string userId)
         {
             var ext = GetMimeType(file.FileName);
+
             var epoch = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds();
             var fileName = $"{epoch}-{userId}.{ext}";
             var webRoot = _env.WebRootPath;
@@ -297,21 +304,17 @@ namespace Bangazon.Controllers
                 "images",
                 fileName);
             string relFilePath = null;
-            try
+            if (file.Length < 5242880) throw new Exception("File too large!");
+            if (file.Length > 0)
             {
-                if (file.Length > 0)
+                using (var stream = new FileStream(absoluteFilePath, FileMode.Create))
                 {
-                    using (var stream = new FileStream(absoluteFilePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                        relFilePath =  $"~/images/{fileName}";
-                    };
-                }
+                    await file.CopyToAsync(stream);
+                    relFilePath = $"~/images/{fileName}";
+                };
+            }
 
-            }
-            catch (Exception ex) {
-                Console.WriteLine(ex);
-            }
+
             return relFilePath;
         }
 
