@@ -38,10 +38,7 @@
                     <td>
                         
                         <form asp-action="RemoveFromCart" asp-route-id="@item.Product.ProductId" asp-route-orderId="@Model.Order.OrderId">
-                            <div class="form-group">
-                                @*<input hidden></input>*@
-                            </div>
-                            <button class="btn btn-danger" type="submit">Remove From Cart</button>
+                            <button class="btn-sm btn-danger" type="submit">Remove</button>
                         </form>
                     </td>
                 </tr>
@@ -50,6 +47,7 @@
                     <td> </td>
                     <td class="font-weight-bold border-bottom-0">Total:</td>
                     <td class="font-weight-bold">$@(Model.Total)</td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>

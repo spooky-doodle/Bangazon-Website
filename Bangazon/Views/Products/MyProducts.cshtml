@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Bangazon.Models.Product>
+﻿@model IEnumerable<Bangazon.Models.ProductViewModels.ProductWithQuantity>
 
 @{
     ViewData["Title"] = "MyProducts";
@@ -26,6 +26,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantitySold)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.City)
@@ -62,6 +65,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.QuantitySold)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.City)
