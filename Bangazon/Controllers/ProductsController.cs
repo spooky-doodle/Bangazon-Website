@@ -110,7 +110,15 @@ namespace Bangazon.Controllers
                 return NotFound();
             }
 
-            return View(product);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            var viewModel = new ProductDetailViewModel()
+            {
+                Product = product,
+                User = user
+            };
+
+            return View(viewModel);
         }
 
         public async Task<IActionResult> Types()
@@ -199,6 +207,7 @@ namespace Bangazon.Controllers
         }
 
         // GET: Products/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -211,15 +220,24 @@ namespace Bangazon.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
-            return View(product);
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (user.Id == product.UserId)
+            {
+                ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
+                ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
+                return View(product);
+            }
+
+            return NotFound();
         }
 
         // POST: Products/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ProductId,DateCreated,Description,Title,Price,Quantity,UserId,City,ImagePath,Active,ProductTypeId")] Product product)
         {
@@ -299,17 +317,17 @@ namespace Bangazon.Controllers
 
             if (user != null)
             {
-                var order = await GetOrCreateOrder(user);
+                var order = await GetOrder(user);
+                if(order == null)
+                {
+                    order = await CreateOrder(user);
+                }
 
                 if (_context.OrderProduct.Any(op => op.ProductId == id))
                 {
                     var foundOrder = _context.Order
                         .Include(o => o.OrderProducts)
                         .Where(o => o.UserId == user.Id);
-
-                   
-
-
                 }
                 _context.OrderProduct.Add(new OrderProduct()
                 {
@@ -328,23 +346,24 @@ namespace Bangazon.Controllers
         }
 
         // helper method to get or create order for user
-        public async Task<Order> GetOrCreateOrder(ApplicationUser user)
+        public async Task<Order> GetOrder(ApplicationUser user)
         {
-            var foundOrder = await _context.Order
+            return await _context.Order
                                 .Where(o => o.DateCompleted == null)
                                 .FirstOrDefaultAsync(o => o.UserId == user.Id);
 
-            if(foundOrder == null)
-            {
-                foundOrder = new Order()
-                {
-                    UserId = user.Id
-                };
-                _context.Order.Add(foundOrder);
-                await _context.SaveChangesAsync();
-            }
+        }
 
-            return foundOrder;
+        public async Task<Order> CreateOrder(ApplicationUser user)
+        {
+            var newOrder = new Order()
+            {
+                UserId = user.Id
+            };
+            _context.Order.Add(newOrder);
+            await _context.SaveChangesAsync();
+
+            return newOrder;
         }
 
         private bool ProductExists(int id)

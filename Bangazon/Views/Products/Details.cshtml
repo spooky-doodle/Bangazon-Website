@@ -1,4 +1,6 @@
-﻿@model Bangazon.Models.Product
+﻿@model Bangazon.Models.ProductViewModels.ProductDetailViewModel
+
+@model Bangazon.Models.Product
 @{
     ViewData["Title"] = "Details";
 }
@@ -12,46 +14,47 @@
         <div class="col-sm-6">
             <dl class="row">
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.DateCreated)
+                    @Html.DisplayNameFor(model => model.Product.DateCreated)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.DateCreated)
+                    @Html.DisplayFor(model => model.Product.DateCreated)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Description)
+                    @Html.DisplayNameFor(model => model.Product.Description)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Description)
+                    @Html.DisplayFor(model => model.Product.Description)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Title)
+                    @Html.DisplayNameFor(model => model.Product.Title)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Title)
+                    @Html.DisplayFor(model => model.Product.Title)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Price)
+                    @Html.DisplayNameFor(model => model.Product.Price)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Price)
+                    @Html.DisplayFor(model => model.Product.Price)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Quantity)
+                    @Html.DisplayNameFor(model => model.Product.Quantity)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Quantity)
+                    @Html.DisplayFor(model => model.Product.Quantity) @if (Model.User != null && Model.Product.UserId == Model.User.Id)
+                    {<a style="margin-left: 1rem" asp-action="Edit" asp-route-id="@Model.Product.ProductId">Update Quantity</a>}
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.City)
+                    @Html.DisplayNameFor(model => model.Product.City)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.City)
+                    @Html.DisplayFor(model => model.Product.City)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Active)
+                    @Html.DisplayNameFor(model => model.Product.Active)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Active)
+                    @Html.DisplayFor(model => model.Product.Active)
                 </dd>
                 <dt class="col-4">
                     @Html.DisplayNameFor(model => model.User)
@@ -60,25 +63,21 @@
                     @Html.DisplayFor(model => model.User.FullName)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.ProductType)
+                    @Html.DisplayNameFor(model => model.Product.ProductType)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.ProductType.Label)
+                    @Html.DisplayFor(model => model.Product.ProductType.Label)
                 </dd>
             </dl>
         </div>
         <div class="col-sm-6">
-            <img src="@Url.Content(Model.ImagePath)" class="img-fluid" />
+            <img src="@Url.Content(Model.Product.ImagePath)" class="img-fluid"/>
         </div>
     </div>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
-    <a asp-action="Index">Back to List</a> |
-    <form asp-action="ProductToCart" asp-route-id="@Model.ProductId">
-        <input type="submit" value="ProductToCart" />
+    <a asp-action="Index">Back to List</a>
+    <form style="margin-top: 1rem" asp-action="ProductToCart" asp-route-id="@Model.Product.ProductId">
+        <input class="btn btn-primary" type="submit" value="Add To Cart" />
     </form>
 </div>
-
-
-
