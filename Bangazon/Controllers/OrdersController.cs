@@ -41,8 +41,7 @@ namespace Bangazon.Controllers
                 {
                     viewModel.LineItems = GetLineItems(viewModel.Order.OrderProducts);
                 }
-                    return View(viewModel);
-
+                return View(viewModel);
             }
             else
             {
@@ -50,20 +49,44 @@ namespace Bangazon.Controllers
             }
         }
 
+      
+
         // get products from list of OProducts.
         private ICollection<OrderLineItem> GetLineItems(ICollection<OrderProduct> orderProducts)
         {
-           // second param of this groupBy is: key(int) is productId/ group is list of orderproducts that correspond to the shared key
-            return orderProducts.GroupBy(p  => p.ProductId, (key, group) => 
-            {
-                 return new OrderLineItem()
-                {
-                    Units = group.Count(),
-                    Product = group.First().Product
-                }; 
-            }).ToList();
-  
+            // second param of this groupBy is: key(int) is productId/ group is list of orderproducts that correspond to the shared key
+            return orderProducts.GroupBy(p => p.ProductId, (key, group) =>
+           {
+               return new OrderLineItem()
+               {
+                   Units = group.Count(),
+                   Product = group.First().Product
+               };
+           }).ToList();
+
         }
+
+        //Delete From Cart
+        [HttpPost, ActionName("RemoveFromCart")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveFromCart([FromRoute] int id)
+        {
+            var foundOrder = await GetOrder();
+            var orderProduct = await _context.OrderProduct.FirstOrDefaultAsync(op => op.ProductId == id && op.OrderId == foundOrder.OrderId);
+            _context.OrderProduct.Remove(orderProduct);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Cart", "Orders");
+        }
+
+        // helper method to get or create order for user
+        public async Task<Order> GetOrder()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            return await _context.Order
+                                .Where(o => o.DateCompleted == null)
+                                .FirstOrDefaultAsync(o => o.UserId == user.Id);
+        }
+
 
         // GET: Orders
         public async Task<IActionResult> Index()

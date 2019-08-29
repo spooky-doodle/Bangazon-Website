@@ -298,17 +298,17 @@ namespace Bangazon.Controllers
 
             if (user != null)
             {
-                var order = await GetOrCreateOrder(user);
+                var order = await GetOrder(user);
+                if(order == null)
+                {
+                    order = await CreateOrder(user);
+                }
 
                 if (_context.OrderProduct.Any(op => op.ProductId == id))
                 {
                     var foundOrder = _context.Order
                         .Include(o => o.OrderProducts)
                         .Where(o => o.UserId == user.Id);
-
-                   
-
-
                 }
                 _context.OrderProduct.Add(new OrderProduct()
                 {
@@ -327,23 +327,24 @@ namespace Bangazon.Controllers
         }
 
         // helper method to get or create order for user
-        public async Task<Order> GetOrCreateOrder(ApplicationUser user)
+        public async Task<Order> GetOrder(ApplicationUser user)
         {
-            var foundOrder = await _context.Order
+            return await _context.Order
                                 .Where(o => o.DateCompleted == null)
                                 .FirstOrDefaultAsync(o => o.UserId == user.Id);
 
-            if(foundOrder == null)
-            {
-                foundOrder = new Order()
-                {
-                    UserId = user.Id
-                };
-                _context.Order.Add(foundOrder);
-                await _context.SaveChangesAsync();
-            }
+        }
 
-            return foundOrder;
+        public async Task<Order> CreateOrder(ApplicationUser user)
+        {
+            var newOrder = new Order()
+            {
+                UserId = user.Id
+            };
+            _context.Order.Add(newOrder);
+            await _context.SaveChangesAsync();
+
+            return newOrder;
         }
 
         private bool ProductExists(int id)
