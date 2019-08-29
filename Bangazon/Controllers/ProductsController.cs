@@ -120,11 +120,31 @@ namespace Bangazon.Controllers
 
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
-{
-    if (id == null)
-    {
-        return NotFound();
-    }
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Product
+                .Include(p => p.ProductType)
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(m => m.ProductId == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            var viewModel = new ProductDetailViewModel()
+            {
+                Product = product,
+                User = user
+            };
+
+            return View(viewModel);
+        }
 
     var product = await _context.Product
         .Include(p => p.ProductType)
@@ -212,6 +232,46 @@ public async Task<IActionResult> Create(
             return NotFound();
         }
 
+
+        // GET: Products/Edit/5
+        [Authorize]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Product.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (user.Id == product.UserId)
+            {
+                ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
+                ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
+                return View(product);
+            }
+
+            return NotFound();
+        }
+
+        // POST: Products/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("ProductId,DateCreated,Description,Title,Price,Quantity,UserId,City,ImagePath,Active,ProductTypeId")] Product product)
+        {
+            if (id != product.ProductId)
+            {
+                return NotFound();
+            }
 
         //string path = Path.Combine(Server.MapPath("~/images"), Path.GetFileName(file.FileName));
         //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
