@@ -33,13 +33,13 @@ namespace Bangazon.Controllers
                 viewModel.Order = await _context.Order
                                             .Include(o => o.User)
                                             .Include(o => o.OrderProducts)
-                                            //.ThenInclude(Op => Op.Product)
+                                            .ThenInclude(Op => Op.Product)
                                             .Where(o => user.Id == o.UserId && o.DateCompleted == null)
                                             .FirstOrDefaultAsync();
                 if (viewModel.Order == null) { viewModel = null; }
                 else
                 {
-                    viewModel.LineItems = await GetLineItems(viewModel.Order.OrderProducts);
+                    viewModel.LineItems = GetLineItems(viewModel.Order.OrderProducts);
                 }
                     return View(viewModel);
 
@@ -51,19 +51,18 @@ namespace Bangazon.Controllers
         }
 
         // get products from list of OProducts.
-        private async Task<ICollection<OrderLineItem>> GetLineItems(ICollection<OrderProduct> orderProducts)
+        private ICollection<OrderLineItem> GetLineItems(ICollection<OrderProduct> orderProducts)
         {
-            var items = new List<OrderLineItem>();
-            var tasks = orderProducts.Select(async prod =>
+           // second param of this groupBy is: key(int) is productId/ group is list of orderproducts that correspond to the shared key
+            return orderProducts.GroupBy(p  => p.ProductId, (key, group) => 
             {
-                items.Add(new OrderLineItem()
+                 return new OrderLineItem()
                 {
-                    Product = await _context.Product.Where(p => p.ProductId == prod.ProductId).FirstOrDefaultAsync(),
-                    Units = await _context.Product.Where(p => p.ProductId == prod.ProductId).CountAsync()
-                });
-            });
-            await Task.WhenAll(tasks);
-            return items;
+                    Units = group.Count(),
+                    Product = group.First().Product
+                }; 
+            }).ToList();
+  
         }
 
         // GET: Orders
