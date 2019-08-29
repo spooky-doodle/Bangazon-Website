@@ -1,11 +1,10 @@
 ﻿@model Bangazon.Models.Product
-
 @{
     ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
-
+<div>@await Component.InvokeAsync("UserProductOpinion", new {productId = Model.ProductId})</div>
 <div>
     <h4>Product</h4>
     <hr />
@@ -69,7 +68,7 @@
             </dl>
         </div>
         <div class="col-sm-6">
-            <img src="@Url.Content(Model.ImagePath)" class="img-fluid"/>
+            <img src="@Url.Content(Model.ImagePath)" class="img-fluid" />
         </div>
     </div>
 </div>

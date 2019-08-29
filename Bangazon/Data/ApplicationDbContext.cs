@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Bangazon.Models;
+using Bangazon.ViewComponents;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
