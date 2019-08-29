@@ -283,17 +283,17 @@ namespace Bangazon.Controllers
             if (user != null)
             {
                 var order = await GetOrCreateOrder(user);
-                
-                //if(_context.OrderProduct.Any(op => op.ProductId == id))
-                //{
-                //    var foundOrder = _context.Order
-                //        .Include(o => o.OrderProducts)
-                //        .Where(o => o.UserId == user.Id);
 
-                //    var foundLineItem = GetLineItems(foundOrder);
-                    
-                    
-                //}
+                if (_context.OrderProduct.Any(op => op.ProductId == id))
+                {
+                    var foundOrder = _context.Order
+                        .Include(o => o.OrderProducts)
+                        .Where(o => o.UserId == user.Id);
+
+                   
+
+
+                }
                 _context.OrderProduct.Add(new OrderProduct()
                 {
                     OrderId = order.OrderId,
