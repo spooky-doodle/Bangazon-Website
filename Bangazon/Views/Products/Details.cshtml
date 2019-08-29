@@ -40,7 +40,7 @@
                     @Html.DisplayNameFor(model => model.Quantity)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Quantity)
+                    @Html.DisplayFor(model => model.Quantity) <a style="margin-left: 1rem" asp-action="Edit" asp-route-id="@Model.ProductId">Update Quantity</a>
                 </dd>
                 <dt class="col-4">
                     @Html.DisplayNameFor(model => model.City)
@@ -74,12 +74,8 @@
     </div>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
-    <a asp-action="Index">Back to List</a> |
-    <form asp-action="ProductToCart" asp-route-id="@Model.ProductId">
-        <input type="submit" value="ProductToCart" />
+    <a asp-action="Index">Back to List</a>
+    <form style="margin-top: 1rem" asp-action="ProductToCart" asp-route-id="@Model.ProductId">
+        <input class="btn btn-primary" type="submit" value="Add To Cart" />
     </form>
 </div>
-
-
-
