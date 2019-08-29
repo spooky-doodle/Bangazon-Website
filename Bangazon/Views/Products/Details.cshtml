@@ -1,12 +1,11 @@
 ﻿@model Bangazon.Models.ProductViewModels.ProductDetailViewModel
 
-@model Bangazon.Models.Product
 @{
     ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
-<div>@await Component.InvokeAsync("UserProductOpinion", new {productId = Model.ProductId})</div>
+<div>@await Component.InvokeAsync("UserProductOpinion", new {productId = Model.Product.ProductId})</div>
 <div>
     <h4>Product</h4>
     <hr />

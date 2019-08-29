@@ -110,8 +110,6 @@ namespace Bangazon.Controllers
                 return NotFound();
             }
 
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-
             var viewModel = new ProductDetailViewModel()
             {
                 Product = product,
