@@ -109,7 +109,15 @@ namespace Bangazon.Controllers
                 return NotFound();
             }
 
-            return View(product);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            var viewModel = new ProductDetailViewModel()
+            {
+                Product = product,
+                User = user
+            };
+
+            return View(viewModel);
         }
 
         public async Task<IActionResult> Types()
@@ -211,9 +219,17 @@ namespace Bangazon.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
-            return View(product);
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            if (user.Id == product.UserId)
+            {
+                ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
+                ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
+                return View(product);
+            }
+
+            return NotFound();
         }
 
         // POST: Products/Edit/5
