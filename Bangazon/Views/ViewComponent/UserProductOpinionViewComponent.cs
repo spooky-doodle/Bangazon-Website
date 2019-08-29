@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bangazon.Views.ViewComponent
 {
-    public class UserProductOpinion
+    public class UserProductOpinionViewComponent : ViewComponent
     {
     }
 }
