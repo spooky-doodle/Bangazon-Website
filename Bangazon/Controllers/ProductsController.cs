@@ -177,25 +177,8 @@ namespace Bangazon.Controllers
             {
                 var user = await GetUserAsync();
                 product.UserId = user.Id;
-                var webRoot = _env.WebRootPath;
-                var filePath = Path.Combine(
-                webRoot,
-                "images",
-                file.FileName);
-
-                var ext = GetMimeType(file.FileName);
-                try
-                {
-                    if (file.Length > 0)
-                    {
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await file.CopyToAsync(stream);
-                            product.ImagePath = $"~/images/{DateTime.Now}-{product.Title}.";
-                        };
-                    }
-
-                }catch (Exception ex) { }
+                product.ImagePath = await SaveFile(file, user.Id);
+                
 
                 //string path = Path.Combine(Server.MapPath("~/images"), Path.GetFileName(file.FileName));
                 //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
@@ -303,13 +286,43 @@ namespace Bangazon.Controllers
             return _userManager.GetUserAsync(HttpContext.User);
         }
 
+        private async Task<string> SaveFile(IFormFile file, string userId)
+        {
+            var ext = GetMimeType(file.FileName);
+            var epoch = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds();
+            var fileName = $"{epoch}-{userId}.{ext}";
+            var webRoot = _env.WebRootPath;
+            var absoluteFilePath = Path.Combine(
+                webRoot,
+                "images",
+                fileName);
+            string relFilePath = null;
+            try
+            {
+                if (file.Length > 0)
+                {
+                    using (var stream = new FileStream(absoluteFilePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                        relFilePath =  $"~/images/{fileName}";
+                    };
+                }
+
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex);
+            }
+            return relFilePath;
+        }
+
 
         private string GetMimeType(string fileName)
         {
             var provider = new FileExtensionContentTypeProvider();
             string contentType;
             provider.TryGetContentType(fileName, out contentType);
-
+            if (contentType == "image/jpeg") contentType = "jpg";
+            else contentType = null;
 
             return contentType;
         }
