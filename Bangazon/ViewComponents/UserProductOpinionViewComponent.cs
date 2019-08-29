@@ -58,7 +58,7 @@ namespace Bangazon.ViewComponents
                 ;
 
             // If there is an open order, query appropriate values
-            
+
             // Render template bound to OrderCountViewModel
             return View(model);
         }
