@@ -11,10 +11,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Bangazon.Models.ProductViewModels;
 using System.IO;
-using Grpc.Core;
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using Bangazon.Models.ProductTypeViewModel;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace Bangazon.Controllers
 {
@@ -22,8 +23,15 @@ namespace Bangazon.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IHostingEnvironment _env;
+
+        public ProductsController(
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            IHostingEnvironment env
+            )
         {
+            _env = env;
             _context = context;
             _userManager = userManager;
         }
@@ -48,7 +56,7 @@ namespace Bangazon.Controllers
             }
             else
             {
-                
+
                 var applicationDbContext = _context.Product
                                             .Include(p => p.ProductType)
                                             .Include(p => p.User)
@@ -135,7 +143,7 @@ namespace Bangazon.Controllers
             var productType = await _context.ProductType
                 .Include(pt => pt.Products)
                 .Where(pt => pt.ProductTypeId == id).SingleAsync();
-                
+
             viewModel.ProductType = productType;
             viewModel.Label = productType.Label;
             viewModel.Products = productType.Products;
@@ -170,12 +178,20 @@ namespace Bangazon.Controllers
             {
                 var user = await GetUserAsync();
                 product.UserId = user.Id;
+                try
+                {
+                    product.ImagePath = await SaveFile(file, user.Id);
+                } catch (Exception ex)
+                {
+                    return NotFound();
+                }
+
 
                 //string path = Path.Combine(Server.MapPath("~/images"), Path.GetFileName(file.FileName));
                 //https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
                 _context.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = product.ProductId});
             }
             ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
@@ -340,6 +356,43 @@ namespace Bangazon.Controllers
             return _userManager.GetUserAsync(HttpContext.User);
         }
 
+        private async Task<string> SaveFile(IFormFile file, string userId)
+        {
+            if (file.Length > 5242880) throw new Exception("File too large!");
+            var ext = GetMimeType(file.FileName);
+            if (ext == null) throw new Exception("Invalid file type");
 
+            var epoch = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds();
+            var fileName = $"{epoch}-{userId}.{ext}";
+            var webRoot = _env.WebRootPath;
+            var absoluteFilePath = Path.Combine(
+                webRoot,
+                "images",
+                fileName);
+            string relFilePath = null;
+            if (file.Length > 0)
+            {
+                using (var stream = new FileStream(absoluteFilePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                    relFilePath = $"~/images/{fileName}";
+                };
+            }
+
+
+            return relFilePath;
+        }
+
+
+        private string GetMimeType(string fileName)
+        {
+            var provider = new FileExtensionContentTypeProvider();
+            string contentType;
+            provider.TryGetContentType(fileName, out contentType);
+            if (contentType == "image/jpeg") contentType = "jpg";
+            else contentType = null;
+
+            return contentType;
+        }
     }
 }
