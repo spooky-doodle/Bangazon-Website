@@ -294,7 +294,9 @@ namespace Bangazon.Controllers
 
         private async Task<string> SaveFile(IFormFile file, string userId)
         {
+            if (file.Length < 5242880) throw new Exception("File too large!");
             var ext = GetMimeType(file.FileName);
+            if (ext == null) throw new Exception("Invalid file type");
 
             var epoch = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds();
             var fileName = $"{epoch}-{userId}.{ext}";
@@ -304,7 +306,6 @@ namespace Bangazon.Controllers
                 "images",
                 fileName);
             string relFilePath = null;
-            if (file.Length < 5242880) throw new Exception("File too large!");
             if (file.Length > 0)
             {
                 using (var stream = new FileStream(absoluteFilePath, FileMode.Create))
