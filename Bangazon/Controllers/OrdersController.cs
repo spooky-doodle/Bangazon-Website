@@ -7,23 +7,81 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Microsoft.AspNetCore.Identity;
+using Bangazon.Models.OrderViewModels;
 
 namespace Bangazon.Controllers
 {
     public class OrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public OrdersController(ApplicationDbContext context)
+        public OrdersController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
+        }
+
+        // Cart
+        public async Task<IActionResult> Cart()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user != null)
+            {
+                var viewModel = new OrderDetailViewModel();
+                viewModel.Order = await _context.Order
+                                            .Include(o => o.User)
+                                            .Include(o => o.OrderProducts)
+                                            //.ThenInclude(Op => Op.Product)
+                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null)
+                                            .FirstOrDefaultAsync();
+                if (viewModel.Order == null) { viewModel = null; }
+                else
+                {
+                    viewModel.LineItems = await GetLineItems(viewModel.Order.OrderProducts);
+                }
+                    return View(viewModel);
+
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        // get products from list of OProducts.
+        private async Task<ICollection<OrderLineItem>> GetLineItems(ICollection<OrderProduct> orderProducts)
+        {
+            var items = new List<OrderLineItem>();
+            var tasks = orderProducts.Select(async prod =>
+            {
+                items.Add(new OrderLineItem()
+                {
+                    Product = await _context.Product.Where(p => p.ProductId == prod.ProductId).FirstOrDefaultAsync(),
+                    Units = await _context.Product.Where(p => p.ProductId == prod.ProductId).CountAsync()
+                });
+            });
+            await Task.WhenAll(tasks);
+            return items;
         }
 
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Order.Include(o => o.PaymentType).Include(o => o.User);
-            return View(await applicationDbContext.ToListAsync());
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user != null)
+            {
+                var applicationDbContext = _context.Order
+                                            .Include(o => o.PaymentType)
+                                            .Include(o => o.User)
+                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null);
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         // GET: Orders/Details/5
