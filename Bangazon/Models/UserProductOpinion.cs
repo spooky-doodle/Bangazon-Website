@@ -14,9 +14,10 @@ namespace Bangazon.Models
 
         public string UserId { get; set; }
 
-
         public int ProductId { get; set; }
 
+        public ApplicationUser ApplicationUser { get; set; }
 
+        public Product Product { get; set; }
     }
 }

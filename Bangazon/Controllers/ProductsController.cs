@@ -276,5 +276,7 @@ namespace Bangazon.Controllers
         {
             return _userManager.GetUserAsync(HttpContext.User);
         }
+
+
     }
 }
