@@ -1,0 +1,72 @@
+﻿@model Bangazon.Models.OrderViewModels.OrderDetailViewModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<h1>Checkout</h1>
+
+<div>
+    <hr />
+    @{ if (Model == null)
+        {
+            <div class="col-sm-2">
+                <p>Your cart is empty.</p>
+            </div>
+        }
+
+        if (Model != null)
+        {
+
+            <form asp-action="CompleteCheckout">
+                <table class="table table-light">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>         </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.LineItems)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.Product.Title)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Units)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Product.Price)</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td> </td>
+                            <td class="font-weight-bold border-bottom-0">Total:</td>
+                            <td class="font-weight-bold">$@(Model.Total)</td>
+                        </tr>
+                        <tr>
+                            <td class="font-weight-bold border-bottom-0">Select a Payment Type</td>
+                            <td>
+                                <div class="form-group">
+                                    <select asp-for="PaymentTypeId" class="form-control" asp-items="Model.PaymentOptions"></select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <input type="submit" value="Complete Order" class="btn btn-primary" />
+                                </div>
+                            </td>
+
+
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+            <hr />
+            <div>
+                <a asp-action="Delete" asp-route-id="@Model.Order.OrderId">Cancel Order</a> |
+                <a asp-action="Edit" asp-route-id="@Model.Order.OrderId">Edit</a> |
+                <a asp-action="Index">Back to List</a>
+            </div>
+        }
+    }
+</div>

@@ -37,22 +37,7 @@ namespace Bangazon.Controllers
             }
         }
 
-        private async Task<OrderDetailViewModel> CreateCartViewModel(ApplicationUser user)
-        {
-            var viewModel = new OrderDetailViewModel();
-            viewModel.Order = await _context.Order
-                                            .Include(o => o.User)
-                                            .Include(o => o.OrderProducts)
-                                            .ThenInclude(Op => Op.Product)
-                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null)
-                                            .FirstOrDefaultAsync();
-            if (viewModel.Order == null) { viewModel = null; }
-            else
-            {
-                viewModel.LineItems = GetLineItems(viewModel.Order.OrderProducts);
-            }
-            return viewModel;
-        }
+
 
 
 
@@ -83,14 +68,7 @@ namespace Bangazon.Controllers
             return RedirectToAction("Cart", "Orders");
         }
 
-        // helper method to get or create order for user
-        public async Task<Order> GetOrder()
-        {
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            return await _context.Order
-                                .Where(o => o.DateCompleted == null)
-                                .FirstOrDefaultAsync(o => o.UserId == user.Id);
-        }
+
 
 
 
@@ -255,6 +233,68 @@ namespace Bangazon.Controllers
         }
 
 
+        public async Task<IActionResult> Checkout()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            OrderDetailViewModel viewModel = null;
+            if (user != null)
+            {
+                viewModel = await CreateCartViewModel(user);
+                viewModel.PaymentOptions = (await GetUserPaymentTypes(user))
+                    .Select(pt => new SelectListItem()
+                    {
+                        Text = pt.Description,
+                        Value = pt.PaymentTypeId.ToString()
+                    }).ToList();
+
+
+                return View(viewModel);
+            }
+            else
+            {
+                return NotFound();
+            }
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteCheckout(OrderDetailViewModel model)
+        {
+            var order = await GetOrder();
+            if (order == null) return NotFound();
+
+            order.DateCompleted = DateTime.UtcNow;
+            order.PaymentTypeId = model.PaymentTypeId;
+            await _context.SaveChangesAsync();
+
+
+
+            return RedirectToAction(nameof(ThankYou));
+        }
+
+
+        public async Task<IActionResult> ThankYou()
+        {
+
+            return View();
+        }
+
+        //    ************************
+        //    ***  HELPER METHODS  ***
+        //    ************************ 
+
+
+
+        // helper method to get or create order for user
+        public async Task<Order> GetOrder()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            return await _context.Order
+                                .Where(o => o.DateCompleted == null)
+                                .FirstOrDefaultAsync(o => o.UserId == user.Id);
+        }
+
         public async Task<Order> GetOrderWithProducts(int id)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -262,6 +302,29 @@ namespace Bangazon.Controllers
                                 .Where(o => o.DateCompleted == null && o.OrderId == id)
                                 .Include(o => o.OrderProducts)
                                 .FirstOrDefaultAsync(o => o.UserId == user.Id);
+        }
+
+        public async Task<ICollection<PaymentType>> GetUserPaymentTypes(ApplicationUser user)
+        {
+            return await _context.PaymentType.Where(pt => pt.UserId == user.Id).ToListAsync();
+        }
+
+
+        private async Task<OrderDetailViewModel> CreateCartViewModel(ApplicationUser user)
+        {
+            var viewModel = new OrderDetailViewModel();
+            viewModel.Order = await _context.Order
+                                            .Include(o => o.User)
+                                            .Include(o => o.OrderProducts)
+                                            .ThenInclude(Op => Op.Product)
+                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null)
+                                            .FirstOrDefaultAsync();
+            if (viewModel.Order == null) { viewModel = null; }
+            else
+            {
+                viewModel.LineItems = GetLineItems(viewModel.Order.OrderProducts);
+            }
+            return viewModel;
         }
 
         private bool OrderExists(int id)
