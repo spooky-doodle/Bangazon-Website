@@ -55,6 +55,7 @@
         </table>
         <hr />
         <div>
+            <a asp-action="Delete" asp-route-id="@Model.Order.OrderId">Cancel Order</a> |
             <a asp-action="Edit" asp-route-id="@Model.Order.OrderId">Edit</a> |
             <a asp-action="Index">Back to List</a>
         </div>
