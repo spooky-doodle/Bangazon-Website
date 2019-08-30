@@ -24,6 +24,11 @@
                 <span asp-validation-for="Input.AccountNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Input.ExpirationDate" class="control-label"></label>
+                <input asp-for="Input.ExpirationDate" type="date" asp-format="{0:yyyy-MM-dd}" class="form-control" />
+                <span asp-validation-for="Input.ExpirationDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Add Payment Option" class="btn btn-primary" />
             </div>
         </form>

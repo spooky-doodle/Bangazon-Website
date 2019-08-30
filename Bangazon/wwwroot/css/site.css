@@ -61,3 +61,16 @@ body {
     flex-direction: row;
     justify-content: space-between;
 }
+
+.navbar-brand {
+    padding: 0;
+}
+
+.logo {
+    margin: 0;
+}
+
+#main-logo {
+    width: 200px;
+    height: 50px;
+}

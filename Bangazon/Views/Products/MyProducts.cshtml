@@ -9,6 +9,14 @@
 <p>
     <a asp-action="Create">Sell Something</a>
 </p>
+@using (Html.BeginForm())
+{
+    //search input
+    <p>
+        Find Products: @Html.TextBox("userInput")
+        <input type="submit" value="Search" onclick="window.location='@Url.Action("Index", "Products")'" />
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -26,6 +34,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.QuantitySold)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.City)
