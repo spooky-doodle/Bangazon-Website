@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,6 +16,10 @@ namespace Bangazon.Models.OrderViewModels
                 return LineItems.Select(i => i.Cost).Sum();
             }
         }
+
+        public List<SelectListItem> PaymentOptions { get; set; }
+
+        public int PaymentTypeId { get; set; }
     }
 
 }

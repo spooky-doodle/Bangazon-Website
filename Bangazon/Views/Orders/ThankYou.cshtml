@@ -1,0 +1,30 @@
+﻿@model Bangazon.Models.OrderViewModels.ThankYouViewModel
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h1>Thank you for your order.</h1>
+<br />
+<table class="table table-light">
+    <thead class="thead-dark">
+        <tr>
+            <th>Your items will be shipped soon.</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+            <tr>
+                <td>Your confirmation number is: </td>
+                <td>@Model.ConfirmationNumber</td>
+            </tr>
+            <tr>
+                <td>
+                    <a class="btn btn-primary" asp-area="" asp-controller="Products" asp-action="Index">Back to Home</a>
+
+                </td>
+                <td></td>
+            </tr>
+    </tbody>
+</table>
+

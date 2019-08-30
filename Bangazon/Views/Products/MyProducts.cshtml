@@ -82,7 +82,7 @@
                     @Html.DisplayFor(modelItem => item.City)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ImagePath)
+                    <img src="@Url.Content(item.ImagePath)" style="max-height: 100px; max-width:100px;" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Active)
