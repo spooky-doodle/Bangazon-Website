@@ -75,14 +75,11 @@ namespace Bangazon.Controllers
                                             .Where(p => p.Title.Contains(userInput) && p.UserId == user.Id)
                                             //.Select(p => (ProductWithQuantity)p)
                                             .ToListAsync();
-                var castProds = myProds.Select(p =>
+                myProds.ForEach(p =>
                 {
-                    var prod = (ProductWithQuantity)p;
-                    prod.QuantitySold = prod.OrderProducts.Where(op => op.Order.DateCompleted != null).Count();
-                    return prod;
+                    p.QuantitySold = p.OrderProducts.Where(op => op.Order.DateCompleted != null).Count();
                 });
-
-                return View(castProds);
+                return View(myProds);
             }
             else
             {
