@@ -32,6 +32,7 @@ namespace Bangazon.Models
         public double Price { get; set; }
 
         [Required]
+        [Range(0, 10000, ErrorMessage = "You can't have a negative quantity")]
         public int Quantity { get; set; }
         [Required]
         public string UserId {get; set;}
@@ -57,6 +58,9 @@ namespace Bangazon.Models
         {
             Active = true;
         }
+
+        [NotMapped]
+        public int QuantitySold { get; set; }
 
     }
 }
