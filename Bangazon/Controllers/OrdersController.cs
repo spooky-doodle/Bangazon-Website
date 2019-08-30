@@ -264,6 +264,8 @@ namespace Bangazon.Controllers
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var order = await GetOrder();
+            List<OrderProduct> ops = await _context.OrderProduct.Where(op => op.OrderId == order.OrderId).Include(op => op.Product).ToListAsync();
+            ops.ForEach(op => op.Product.Quantity--);
             if (order == null) return NotFound();
             var dateCompleted = DateTime.UtcNow;
             order.DateCompleted = dateCompleted;
