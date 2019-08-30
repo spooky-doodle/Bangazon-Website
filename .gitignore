@@ -261,4 +261,4 @@ __pycache__/
 *.pyc
 
 appsettings.json
-Bangazon/wwwroot/images
+Bangazon/wwwroot/images/*.jpg
