@@ -11,6 +11,7 @@
 </p>
 @using (Html.BeginForm())
 {
+    //search input
     <p>
         Find Products: @Html.TextBox("userInput")
         <input type="submit" value="Search" onclick="window.location='@Url.Action("Index", "Products")'" />
