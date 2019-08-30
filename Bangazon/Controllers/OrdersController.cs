@@ -9,6 +9,7 @@ using Bangazon.Data;
 using Bangazon.Models;
 using Microsoft.AspNetCore.Identity;
 using Bangazon.Models.OrderViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bangazon.Controllers
 {
@@ -259,25 +260,39 @@ namespace Bangazon.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CompleteCheckout(OrderDetailViewModel model)
+        public async Task<IActionResult> CompleteCheckout(int PaymentTypeId)
         {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
             var order = await GetOrder();
             if (order == null) return NotFound();
-
-            order.DateCompleted = DateTime.UtcNow;
-            order.PaymentTypeId = model.PaymentTypeId;
+            var dateCompleted = DateTime.UtcNow;
+            order.DateCompleted = dateCompleted;
+            order.PaymentTypeId = PaymentTypeId;
             await _context.SaveChangesAsync();
 
 
 
-            return RedirectToAction(nameof(ThankYou));
+            return RedirectToAction(nameof(ThankYou), new { orderId = order.OrderId});
         }
 
-
-        public async Task<IActionResult> ThankYou()
+        [Authorize]
+        public async Task<IActionResult> ThankYou(int orderId)
         {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var order = await _context.Order.FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == user.Id);
+            if (order != null)
+            {
+                var epoch = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            return View();
+
+                var viewModel = new ThankYouViewModel()
+                {
+                    ConfirmationNumber = $"{epoch}-{user.Id}"
+                };
+                return View(viewModel);
+            }
+            else return NotFound();
+            
         }
 
         //    ************************
