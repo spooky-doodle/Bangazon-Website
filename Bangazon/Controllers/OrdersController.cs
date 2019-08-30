@@ -29,19 +29,7 @@ namespace Bangazon.Controllers
             var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user != null)
             {
-                var viewModel = new OrderDetailViewModel();
-                viewModel.Order = await _context.Order
-                                            .Include(o => o.User)
-                                            .Include(o => o.OrderProducts)
-                                            .ThenInclude(Op => Op.Product)
-                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null)
-                                            .FirstOrDefaultAsync();
-                if (viewModel.Order == null) { viewModel = null; }
-                else
-                {
-                    viewModel.LineItems = GetLineItems(viewModel.Order.OrderProducts);
-                }
-                return View(viewModel);
+                return View(await CreateCartViewModel(user));
             }
             else
             {
@@ -49,7 +37,24 @@ namespace Bangazon.Controllers
             }
         }
 
-      
+        private async Task<OrderDetailViewModel> CreateCartViewModel(ApplicationUser user)
+        {
+            var viewModel = new OrderDetailViewModel();
+            viewModel.Order = await _context.Order
+                                            .Include(o => o.User)
+                                            .Include(o => o.OrderProducts)
+                                            .ThenInclude(Op => Op.Product)
+                                            .Where(o => user.Id == o.UserId && o.DateCompleted == null)
+                                            .FirstOrDefaultAsync();
+            if (viewModel.Order == null) { viewModel = null; }
+            else
+            {
+                viewModel.LineItems = GetLineItems(viewModel.Order.OrderProducts);
+            }
+            return viewModel;
+        }
+
+
 
         // get products from list of OProducts.
         private ICollection<OrderLineItem> GetLineItems(ICollection<OrderProduct> orderProducts)
@@ -86,6 +91,7 @@ namespace Bangazon.Controllers
                                 .Where(o => o.DateCompleted == null)
                                 .FirstOrDefaultAsync(o => o.UserId == user.Id);
         }
+
 
 
         // GET: Orders
@@ -215,27 +221,47 @@ namespace Bangazon.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Order
-                .Include(o => o.PaymentType)
-                .Include(o => o.User)
-                .FirstOrDefaultAsync(m => m.OrderId == id);
-            if (order == null)
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user == null) return NotFound();
+
+            var viewModel = await CreateCartViewModel(user);
+
+
+            if (user == null || viewModel == null)
             {
                 return NotFound();
             }
 
-            return View(order);
+            return View(viewModel);
         }
 
-        // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> CancelOrder(int? id)
         {
-            var order = await _context.Order.FindAsync(id);
-            _context.Order.Remove(order);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (id != null)
+            {
+                var order = await GetOrderWithProducts((int)id);
+                if (order == null || order.UserId != user.Id) return NotFound();
+
+                _context.OrderProduct.RemoveRange(order.OrderProducts);
+                _context.Order.Remove(order);
+                _context.SaveChanges();
+
+                return RedirectToAction(nameof(Index), "Home");
+            }
+            else return NotFound();
+        }
+
+
+        public async Task<Order> GetOrderWithProducts(int id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            return await _context.Order
+                                .Where(o => o.DateCompleted == null && o.OrderId == id)
+                                .Include(o => o.OrderProducts)
+                                .FirstOrDefaultAsync(o => o.UserId == user.Id);
         }
 
         private bool OrderExists(int id)
