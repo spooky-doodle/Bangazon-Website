@@ -1,8 +1,15 @@
-﻿@model Bangazon.Models.ProductViewModels.ProductDetailViewModel
+﻿@using Microsoft.AspNetCore.Identity
+
+@model Bangazon.Models.Product
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Details";
 }
+
+
 
 <h1>Details</h1>
 
@@ -13,47 +20,51 @@
         <div class="col-sm-6">
             <dl class="row">
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.DateCreated)
+                    @Html.DisplayNameFor(model => model.DateCreated)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.DateCreated)
+                    @Html.DisplayFor(model => model.DateCreated)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.Description)
+                    @Html.DisplayNameFor(model => model.Description)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.Description)
+                    @Html.DisplayFor(model => model.Description)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.Title)
+                    @Html.DisplayNameFor(model => model.Title)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.Title)
+                    @Html.DisplayFor(model => model.Title)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.Price)
+                    @Html.DisplayNameFor(model => model.Price)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.Price)
+                    @Html.DisplayFor(model => model.Price)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.Quantity)
+                    @Html.DisplayNameFor(model => model.Quantity)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.Quantity) @if (Model.User != null && Model.Product.UserId == Model.User.Id)
-                    {<a style="margin-left: 1rem" asp-action="Edit" asp-route-id="@Model.Product.ProductId">Update Quantity</a>}
+                    @Html.DisplayFor(model => model.Quantity)
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        @if (UserManager.GetUserAsync(User).Result.Id == Model.UserId)
+                        {<a style="margin-left: 1rem" asp-action="Edit" asp-route-id="@Model.ProductId">Update Quantity</a>}
+                    }
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.City)
+                    @Html.DisplayNameFor(model => model.City)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.City)
+                    @Html.DisplayFor(model => model.City)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.Active)
+                    @Html.DisplayNameFor(model => model.Active)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.Active)
+                    @Html.DisplayFor(model => model.Active)
                 </dd>
                 <dt class="col-4">
                     @Html.DisplayNameFor(model => model.User)
@@ -62,21 +73,21 @@
                     @Html.DisplayFor(model => model.User.FullName)
                 </dd>
                 <dt class="col-4">
-                    @Html.DisplayNameFor(model => model.Product.ProductType)
+                    @Html.DisplayNameFor(model => model.ProductType)
                 </dt>
                 <dd class="col-8">
-                    @Html.DisplayFor(model => model.Product.ProductType.Label)
+                    @Html.DisplayFor(model => model.ProductType.Label)
                 </dd>
             </dl>
         </div>
         <div class="col-sm-6">
-            <img src="@Url.Content(Model.Product.ImagePath)" class="img-fluid"/>
+            <img src="@Url.Content(Model.ImagePath)" class="img-fluid" />
         </div>
     </div>
 </div>
 <div>
     <a asp-action="Index">Back to List</a>
-    <form style="margin-top: 1rem" asp-action="ProductToCart" asp-route-id="@Model.Product.ProductId">
+    <form style="margin-top: 1rem" asp-action="ProductToCart" asp-route-id="@Model.ProductId">
         <input class="btn btn-primary" type="submit" value="Add To Cart" />
     </form>
 </div>
