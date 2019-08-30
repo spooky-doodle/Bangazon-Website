@@ -50,9 +50,6 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
             [Required]
             [StringLength(20)]
             public string AccountNumber { get; set; }
-
-            [Required]
-            public DateTime ExpirationDate { get; set; }
         }
 
         public async Task<IActionResult> OnGet()
@@ -87,7 +84,6 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
                 UserId = user.Id,
                 Description = Input.Description,
                 AccountNumber = Input.AccountNumber,
-                ExpirationDate = Input.ExpirationDate,
                 User = user
             };
 

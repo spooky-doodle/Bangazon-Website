@@ -16,13 +16,6 @@ namespace Bangazon.Models
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public DateTime DateCreated { get; set; }
 
-        //[Required]
-        //[DataType(DataType.Date)]
-        //[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        [Required, Column(TypeName = "Date"), DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
-        [Range(typeof(DateTime), "08/30/2019", "01/01/2014", ErrorMessage = "Invalid Date")]
-        public DateTime ExpirationDate { get; set; }
-
     [Required]
     [StringLength(55)]
     public string Description { get; set; }
